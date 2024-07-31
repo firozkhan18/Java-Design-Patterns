@@ -2828,7 +2828,9 @@ public class FindFirstNonRepeatedCharacter {
 |--------|--------|
 | <pre lang="java"> <code>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} </code></pre> |<pre lang="java"><code>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</code></pre>|
 
-
+| Java 7 | Java 8 |
+|--------|--------|
+| <pre lang="java"> <code><p>public class HelloWorld {<p></p>    public static void main(String[] args) {<p></p>        System.out.println("Hello, World!");<p></p>    }<p></p>} </code></pre> |<pre lang="java"><code><p>public class HelloWorld {<p></p>   public static void main(String[] args) {<p></p>       System.out.println("Hello, World!");<p></p>    }<p></p>}</code></pre>|
 
 <!-- language-all: json -->
 

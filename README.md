@@ -2824,3 +2824,449 @@ public class FindFirstNonRepeatedCharacter {
 |--------|--------|
 | <pre> public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} </pre> |<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre>|
 
+In Java 8, `Function.identity()` is a static method of the `Function` interface that returns a function that always returns its input argument. It can be used in various scenarios, especially when working with streams and functional programming. Here are some common use cases:
+
+### 1. **Grouping Elements in Streams**
+
+When grouping elements of a stream and you want to group by the elements themselves (i.e., the identity of the elements), you can use `Function.identity()` as the classifier function.
+
+**Example: Counting occurrences of elements in a list**
+
+```java
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class Example {
+    public static void main(String[] args) {
+        List<String> words = Arrays.asList("apple", "banana", "apple", "orange", "banana", "banana");
+
+        Map<String, Long> wordCounts = words.stream()
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        System.out.println(wordCounts);
+    }
+}
+```
+
+In this example:
+- `Function.identity()` is used to group elements by themselves.
+- `Collectors.counting()` counts occurrences of each element.
+
+### 2. **Identity Function in Composition**
+
+In function composition, sometimes you might want to indicate that no transformation is needed for a particular part of the composition. `Function.identity()` serves as a no-op or placeholder function.
+
+**Example: Using identity function in function composition**
+
+```java
+import java.util.function.Function;
+
+public class Example {
+    public static void main(String[] args) {
+        Function<String, String> identity = Function.identity();
+        String result = identity.apply("Hello, World!");
+        System.out.println(result); // Output: Hello, World!
+    }
+}
+```
+
+Here, `Function.identity()` is used to create a function that simply returns its input, which can be useful in more complex function compositions.
+
+### 3. **Default Functions in Data Structures**
+
+When working with data structures that require a function argument but you don't want to perform any transformation, `Function.identity()` can be used.
+
+**Example: Mapping keys to values in a map**
+
+```java
+import java.util.function.Function;
+import java.util.Map;
+import java.util.HashMap;
+
+public class Example {
+    public static void main(String[] args) {
+        Function<String, String> identityFunction = Function.identity();
+        
+        Map<String, String> map = new HashMap<>();
+        map.put("key1", identityFunction.apply("value1")); // Stores "value1"
+        map.put("key2", identityFunction.apply("value2")); // Stores "value2"
+        
+        System.out.println(map); // Output: {key1=value1, key2=value2}
+    }
+}
+```
+
+In this example, `Function.identity()` is used to map values directly without transformation.
+
+### 4. **Placeholder in Method References**
+
+When you want to pass a method reference that does not alter its input, you might use `Function.identity()` as a placeholder.
+
+**Example: Method reference as a no-op**
+
+```java
+import java.util.function.Function;
+import java.util.Arrays;
+
+public class Example {
+    public static void main(String[] args) {
+        String[] words = {"apple", "banana", "cherry"};
+
+        Arrays.stream(words)
+              .map(Function.identity()) // No transformation, just passes through
+              .forEach(System.out::println); // Prints each word
+    }
+}
+```
+
+Here, `Function.identity()` is used to indicate that the stream elements should be passed through unchanged.
+
+### 5. **Default Mapping in Functional Interfaces**
+
+In some functional interfaces or scenarios where you need a default or trivial implementation, `Function.identity()` can be useful.
+
+**Example: Default implementation for a functional interface**
+
+```java
+import java.util.function.Function;
+
+public class Example {
+    public static void main(String[] args) {
+        Function<Integer, Integer> square = x -> x * x;
+        Function<Integer, Integer> identity = Function.identity();
+        
+        // Using square function
+        System.out.println(square.apply(4)); // Output: 16
+
+        // Using identity function
+        System.out.println(identity.apply(4)); // Output: 4
+    }
+}
+```
+
+### Summary
+
+`Function.identity()` is useful in scenarios where you need:
+- To group elements by themselves.
+- To provide a no-op function in function composition.
+- To use a default or trivial transformation.
+- To pass through elements unchanged in streams or other functional contexts.
+
+It simplifies code by providing a standard way to refer to functions that don't modify their input, making your code cleaner and more expressive.
+
+
+In Java 8, the `Collectors.groupingBy()` method is a powerful tool provided by the `Collectors` utility class, which is used to perform grouping operations on elements of a stream. It allows you to group elements based on some criteria and then perform aggregations on these groups. 
+
+Here’s a detailed explanation of how `Collectors.groupingBy(Function.identity(), Collectors.counting())` works:
+
+### `Collectors.groupingBy()`
+
+The `Collectors.groupingBy()` method is used to group elements of a stream by a classifier function. It returns a `Map` where the keys are the result of applying the classifier function to the elements, and the values are lists of items that share the same key.
+
+### `Function.identity()`
+
+- **Purpose**: `Function.identity()` is a static method in the `Function` interface that returns a function that always returns its input argument. This function can be used when you need a `Function` that doesn't alter its input and simply returns it as is.
+  
+- **Use in `groupingBy()`**: When you use `Function.identity()` as the classifier function in `Collectors.groupingBy()`, it means that the elements themselves are used as the keys in the resulting map. In other words, you're grouping elements by their own values.
+
+### `Collectors.counting()`
+
+- **Purpose**: `Collectors.counting()` is a collector that counts the number of elements in a group. When used with `Collectors.groupingBy()`, it will count how many elements are in each group.
+
+### Putting It All Together
+
+When you use `Collectors.groupingBy(Function.identity(), Collectors.counting())`, you are effectively doing the following:
+
+1. **Grouping by Identity**: You are grouping elements by their own values. This means that each unique value in the stream becomes a key in the resulting map.
+
+2. **Counting Occurrences**: For each group (which, in this case, corresponds to each unique value), you are counting how many times that value appears in the stream.
+
+### Example
+
+Here’s an example to illustrate:
+
+```java
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Example {
+    public static void main(String[] args) {
+        List<String> words = Arrays.asList("apple", "banana", "apple", "orange", "banana", "banana");
+
+        // Group by word and count occurrences
+        Map<String, Long> wordCounts = words.stream()
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        System.out.println(wordCounts);
+    }
+}
+```
+
+### Explanation of Example
+
+- **Input List**: `["apple", "banana", "apple", "orange", "banana", "banana"]`
+- **Grouping**: The stream elements (`"apple"`, `"banana"`, `"orange"`) are grouped by their own values.
+- **Counting**: For each unique element, count how many times it appears in the list.
+
+**Output**:
+```
+{apple=2, banana=3, orange=1}
+```
+
+In this map:
+- `"apple"` appears 2 times.
+- `"banana"` appears 3 times.
+- `"orange"` appears 1 time.
+
+### Summary
+
+- **`Function.identity()`**: Used as the classifier function in `groupingBy()` to group elements by their own values.
+- **`Collectors.groupingBy()`**: Groups elements of a stream into a map where keys are the results of applying the classifier function, and values are lists of items.
+- **`Collectors.counting()`**: Counts the number of items in each group created by `groupingBy()`.
+
+Using `Function.identity()` with `Collectors.groupingBy()` and `Collectors.counting()` is a common idiom in Java streams for counting occurrences of each unique element in a collection.
+
+
+To find the first non-repeated character in a string using Java 8 features, such as streams and lambda expressions, you can follow a similar approach to the one described earlier but leverage the power of streams for a more functional programming style.
+
+Here’s how you can do it:
+
+1. **Use a `Map`** to count the frequency of each character.
+2. **Use Streams** to find the first character with a count of 1.
+
+Here’s a Java 8 program that demonstrates this approach:
+
+```java
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class FirstNonRepeatedCharacter {
+    public static void main(String[] args) {
+        String input = "swiss"; // Example input
+        char result = findFirstNonRepeatedCharacter(input);
+        
+        if (result != '\0') {
+            System.out.println("The first non-repeated character is: " + result);
+        } else {
+            System.out.println("No non-repeated character found.");
+        }
+    }
+
+    public static char findFirstNonRepeatedCharacter(String str) {
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException("Input string cannot be null or empty.");
+        }
+
+        // Step 1: Create a map with character frequencies
+        Map<Character, Long> frequencyMap = str.chars() // Create an IntStream of characters
+            .mapToObj(c -> (char) c) // Convert int to Character
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // Step 2: Find the first non-repeated character
+        return str.chars() // Create an IntStream of characters
+            .mapToObj(c -> (char) c) // Convert int to Character
+            .filter(c -> frequencyMap.get(c) == 1) // Filter characters with frequency of 1
+            .findFirst() // Get the first matching element
+            .orElse('\0'); // Return '\0' if no non-repeated character is found
+    }
+}
+```
+
+### Explanation:
+
+1. **Create Frequency Map**:
+   - `str.chars()` creates an `IntStream` of characters.
+   - `mapToObj(c -> (char) c)` converts the `int` values to `Character` objects.
+   - `Collectors.groupingBy(Function.identity(), Collectors.counting())` collects characters into a `Map` with the character as the key and its frequency as the value.
+
+2. **Find First Non-Repeated Character**:
+   - `str.chars()` creates an `IntStream` again to process characters.
+   - `mapToObj(c -> (char) c)` converts the `int` values to `Character` objects.
+   - `filter(c -> frequencyMap.get(c) == 1)` filters characters that have a frequency of 1.
+   - `findFirst()` retrieves the first element of the stream.
+   - `orElse('\0')` provides a default value of `'\0'` if no non-repeated character is found.
+
+### Considerations:
+
+- The program handles null or empty input and throws an `IllegalArgumentException` in such cases.
+- The time complexity of this solution is \(O(n)\), where \(n\) is the length of the string, due to the linear processing of characters using streams.
+
+This approach demonstrates how you can leverage Java 8 streams and functional programming concepts to solve the problem concisely and elegantly.
+
+
+To find the first non-repeated character in a string using Java 8 features, such as streams and lambda expressions, you can follow a similar approach to the one described earlier but leverage the power of streams for a more functional programming style.
+
+Here’s how you can do it:
+
+1. **Use a `Map`** to count the frequency of each character.
+2. **Use Streams** to find the first character with a count of 1.
+
+Here’s a Java 8 program that demonstrates this approach:
+
+```java
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class FirstNonRepeatedCharacter {
+    public static void main(String[] args) {
+        String input = "swiss"; // Example input
+        char result = findFirstNonRepeatedCharacter(input);
+        
+        if (result != '\0') {
+            System.out.println("The first non-repeated character is: " + result);
+        } else {
+            System.out.println("No non-repeated character found.");
+        }
+    }
+
+    public static char findFirstNonRepeatedCharacter(String str) {
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException("Input string cannot be null or empty.");
+        }
+
+        // Step 1: Create a map with character frequencies
+        Map<Character, Long> frequencyMap = str.chars() // Create an IntStream of characters
+            .mapToObj(c -> (char) c) // Convert int to Character
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // Step 2: Find the first non-repeated character
+        return str.chars() // Create an IntStream of characters
+            .mapToObj(c -> (char) c) // Convert int to Character
+            .filter(c -> frequencyMap.get(c) == 1) // Filter characters with frequency of 1
+            .findFirst() // Get the first matching element
+            .orElse('\0'); // Return '\0' if no non-repeated character is found
+    }
+}
+```
+
+### Explanation:
+
+1. **Create Frequency Map**:
+   - `str.chars()` creates an `IntStream` of characters.
+   - `mapToObj(c -> (char) c)` converts the `int` values to `Character` objects.
+   - `Collectors.groupingBy(Function.identity(), Collectors.counting())` collects characters into a `Map` with the character as the key and its frequency as the value.
+
+2. **Find First Non-Repeated Character**:
+   - `str.chars()` creates an `IntStream` again to process characters.
+   - `mapToObj(c -> (char) c)` converts the `int` values to `Character` objects.
+   - `filter(c -> frequencyMap.get(c) == 1)` filters characters that have a frequency of 1.
+   - `findFirst()` retrieves the first element of the stream.
+   - `orElse('\0')` provides a default value of `'\0'` if no non-repeated character is found.
+
+### Considerations:
+
+- The program handles null or empty input and throws an `IllegalArgumentException` in such cases.
+- The time complexity of this solution is \(O(n)\), where \(n\) is the length of the string, due to the linear processing of characters using streams.
+
+This approach demonstrates how you can leverage Java 8 streams and functional programming concepts to solve the problem concisely and elegantly.
+
+To find the first non-repeated character in a string in Java, you can follow these steps:
+
+1. **Count the frequency** of each character in the string using a `HashMap`.
+2. **Iterate through the string** again to find the first character with a count of 1 in the `HashMap`.
+
+Here's a Java program that demonstrates this approach:
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+public class FirstNonRepeatedCharacter {
+    public static void main(String[] args) {
+        String input = "swiss"; // Example input
+        char result = findFirstNonRepeatedCharacter(input);
+        
+        if (result != 0) {
+            System.out.println("The first non-repeated character is: " + result);
+        } else {
+            System.out.println("No non-repeated character found.");
+        }
+    }
+
+    public static char findFirstNonRepeatedCharacter(String str) {
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException("Input string cannot be null or empty.");
+        }
+
+        // Step 1: Count the frequency of each character
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : str.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
+        }
+
+        // Step 2: Find the first character with a frequency of 1
+        for (char c : str.toCharArray()) {
+            if (frequencyMap.get(c) == 1) {
+                return c;
+            }
+        }
+
+        // If no non-repeated character is found, return a default value (e.g., '\0')
+        return '\0';
+    }
+}
+```
+
+### Explanation:
+
+1. **Count Frequencies**:
+   - Use a `HashMap` to store the frequency of each character. The key is the character, and the value is the count of occurrences.
+   - Iterate through the string and update the counts in the `HashMap`.
+
+2. **Find First Non-Repeated Character**:
+   - Iterate through the string again and use the `HashMap` to check the frequency of each character.
+   - Return the first character that has a frequency of 1.
+
+3. **Edge Cases**:
+   - The program checks for null or empty input and throws an exception if the input is invalid.
+   - If all characters are repeated or if the string is empty, the function returns `'\0'`, which indicates that no non-repeated character was found.
+
+This approach efficiently solves the problem with a time complexity of \(O(n)\), where \(n\) is the length of the string, as both the counting and finding operations are linear in time.
+
+In Java 8, the `Function.identity()` method is a utility method from the `java.util.function.Function` interface. Its purpose is to return a function that always returns its input argument. 
+
+### Purpose
+
+The `Function.identity()` method is used when you need a `Function` that does nothing to its input, effectively returning it unchanged. This can be useful in various scenarios, particularly in stream operations or when dealing with generic code that requires a function.
+
+### Return Value
+
+The method returns a `Function<T, T>`, where `T` is the type of the input and output. This function implementation essentially performs the identity operation, so for any input `x` of type `T`, `Function.identity().apply(x)` will return `x`.
+
+### Example Usage
+
+Here’s a simple example demonstrating its use:
+
+```java
+import java.util.function.Function;
+
+public class IdentityFunctionExample {
+    public static void main(String[] args) {
+        Function<String, String> identityFunction = Function.identity();
+        
+        String input = "Hello, World!";
+        String output = identityFunction.apply(input);
+        
+        System.out.println("Input: " + input);
+        System.out.println("Output: " + output);
+    }
+}
+```
+
+In this example:
+
+1. `Function.identity()` returns a `Function<String, String>` that just returns its input.
+2. When `identityFunction.apply(input)` is called, it returns the same `input` string.
+
+### Practical Use Cases
+
+1. **Stream Operations**: When performing operations on streams, especially when you're interested in keeping the identity of elements but need to pass a function as an argument.
+
+2. **Combining Functions**: When composing functions, you might use `Function.identity()` as a placeholder to indicate that a particular step in a composition does nothing to modify the data.
+
+3. **Generic Methods**: When writing generic methods that accept a `Function`, `Function.identity()` can be used to signify that no transformation is needed.
+
+Overall, `Function.identity()` is a convenient way to obtain a function that performs the identity operation, simplifying code in contexts where a function is required but no actual transformation is desired.

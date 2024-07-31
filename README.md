@@ -2839,7 +2839,7 @@ In standard Markdown, you should avoid using HTML tags for line breaks within co
 
 | Java 7 | Java 8 |
 |--------|--------|
-| ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` |
+| ```java<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> ``` | ```java<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> ``` |
 
 | Name | Signature Code                 |
 |------|--------------------------------|

@@ -2163,3 +2163,658 @@ MapStruct simplifies object mapping between DTOs and entities:
 Ensure compatibility between Java versions. Update libraries to match your Java version.
 
 ---
+### How To Resolve CORS Issues in a Spring Boot Application
+
+CORS (Cross-Origin Resource Sharing) issues often arise when a web application makes requests to a server hosted on a different domain, protocol, or port. In a Spring Boot application, these issues can be resolved by configuring CORS settings to allow requests from specific origins.
+
+Here’s a step-by-step guide to resolve CORS issues in a Spring Boot application:
+
+---
+
+#### **1. Understanding CORS**
+
+When your Angular UI makes a request to your Spring Boot backend API, it might encounter CORS issues if the backend is not configured to allow requests from the origin of the Angular application. This issue occurs because browsers enforce the Same-Origin Policy, which restricts web pages from making requests to a different domain.
+
+---
+
+#### **2. Adding CORS Configuration in Spring Boot**
+
+You can resolve CORS issues in Spring Boot by configuring global CORS settings using a `@Configuration` class. Follow these steps:
+
+**Step 1: Create a Configuration Class**
+
+Create a new configuration class and annotate it with `@Configuration`. This class will define CORS mappings globally.
+
+```java
+package com.example.demo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**") // Allow all paths
+                .allowedOrigins("http://localhost:4200") // Your Angular UI URL
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+    }
+}
+```
+
+**Step 2: Explanation of Configuration**
+
+- `addMapping("/**")`: Applies the CORS configuration to all endpoints.
+- `allowedOrigins("http://localhost:4200")`: Specifies which origin is allowed. Change this URL to match the URL of your Angular application. You can also specify multiple origins by providing an array of URLs.
+- `allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")`: Lists the HTTP methods allowed for CORS requests.
+- `allowedHeaders("*")`: Allows all headers in CORS requests.
+- `allowCredentials(true)`: Allows credentials (like cookies or authorization headers) to be included in the requests.
+
+---
+
+#### **3. Using `@CrossOrigin` Annotation**
+
+Alternatively, you can configure CORS on a per-controller or per-method basis using the `@CrossOrigin` annotation.
+
+**Example of applying `@CrossOrigin` at the controller level:**
+
+```java
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:4200")
+public class MessageController {
+
+    @GetMapping("/message")
+    public String getMessage() {
+        return "Hello, World!";
+    }
+}
+```
+
+**Example of applying `@CrossOrigin` at the method level:**
+
+```java
+@GetMapping("/message")
+@CrossOrigin(origins = "http://localhost:4200")
+public String getMessage() {
+    return "Hello, World!";
+}
+```
+
+This approach is useful if you only need to enable CORS for specific endpoints rather than globally.
+
+---
+
+#### **4. Testing Your Configuration**
+
+After adding CORS configurations, restart your Spring Boot application and test the API calls from your Angular application. If configured correctly, the CORS issues should be resolved, and your Angular application should be able to communicate with the Spring Boot backend without encountering CORS errors.
+
+---
+
+### Summary
+
+In summary, resolving CORS issues in a Spring Boot application involves configuring CORS settings either globally using a `@Configuration` class or locally using the `@CrossOrigin` annotation. This ensures that requests from your Angular UI to your Spring Boot backend are permitted and handled correctly.
+
+
+It looks like you’re working on a Spring Boot configuration class that uses properties to set CORS (Cross-Origin Resource Sharing) settings dynamically. This approach can be useful for externalizing CORS settings into configuration files, making it easier to modify them without changing the code.
+
+Here’s a complete example of how you can use `@Value` annotations to configure CORS settings dynamically based on properties defined in your application configuration files:
+
+### Full Example of CORS Configuration Using Properties
+
+**1. Define Properties in `application.properties` or `application.yml`:**
+
+First, you need to define your CORS settings in the `application.properties` or `application.yml` file. For example, in `application.properties`:
+
+```properties
+cors.allowedOrigins=http://localhost:4200
+cors.allowedMethods=GET,POST,PUT,DELETE,OPTIONS
+cors.allowedHeaders=*
+cors.allowCredentials=true
+```
+
+Or, in `application.yml`:
+
+```yaml
+cors:
+  allowedOrigins: http://localhost:4200
+  allowedMethods: GET,POST,PUT,DELETE,OPTIONS
+  allowedHeaders: "*"
+  allowCredentials: true
+```
+
+**2. Create the `SecurityConfiguration` Class:**
+
+Next, you’ll use these properties in your Spring Boot configuration class. Here’s how you can do it:
+
+```java
+package com.example.demo.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class SecurityConfiguration implements WebMvcConfigurer {
+
+    @Value("${cors.allowedOrigins}")
+    private String[] allowedOrigins;
+
+    @Value("${cors.allowedMethods}")
+    private String allowedMethods;
+
+    @Value("${cors.allowedHeaders}")
+    private String allowedHeaders;
+
+    @Value("${cors.allowCredentials}")
+    private boolean allowCredentials;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(allowedOrigins)
+                .allowedMethods(allowedMethods.split(","))
+                .allowedHeaders(allowedHeaders.split(","))
+                .allowCredentials(allowCredentials);
+    }
+}
+```
+
+**3. Explanation:**
+
+- **`@Value` Annotations:**
+  - `@Value("${cors.allowedOrigins}")` injects the value of the `cors.allowedOrigins` property. It is assumed that this value is a comma-separated list, so it’s split into an array.
+  - `@Value("${cors.allowedMethods}")` injects the allowed HTTP methods. This value is also comma-separated.
+  - `@Value("${cors.allowedHeaders}")` injects the allowed headers. This value can include multiple headers separated by commas.
+  - `@Value("${cors.allowCredentials}")` injects a boolean value indicating whether credentials are allowed in CORS requests.
+
+- **`addCorsMappings(CorsRegistry registry)`:** Configures global CORS settings. It maps the CORS configuration to all paths (`/**`) and uses the values injected from properties to set allowed origins, methods, headers, and credentials.
+
+---
+
+### Additional Considerations
+
+- **Error Handling:** Ensure that the property values are correctly formatted in your `application.properties` or `application.yml` files to avoid runtime errors.
+- **Environment Specific Configurations:** If you need different CORS configurations for different environments (development, production), you can use Spring Profiles to manage environment-specific configurations.
+
+By following these steps, you can dynamically configure CORS settings in your Spring Boot application based on properties defined in your configuration files. This approach makes it easier to manage and adjust CORS settings without modifying the codebase directly.
+
+
+Sort List in Java using JAVA 8 different ways.
+Gain Java Knowledge
+Gain Java Knowledge
+
+·
+Follow
+
+2 min read
+·
+Jul 16, 2023
+3
+
+
+
+
+During a project development , every developer comes across a situation where implementation of sorting becomes mandatory. In this article we will mainly focus on sorting using java 8.
+
+Example 1 : Sort a list of String alphabetically.
+
+List<String> names = Arrays.asList("Vivek", "nasim", "Sumit", "gaurav", "Mohit");
+Print names in sorting order , now here we will use Comparator to sort a list.
+
+names.sort(Comparator.naturalOrder());
+OUTPUT : sorting with natural order : [Mohit, Sumit, Vivek, gaurav, nasim]
+
+naturalOrder() method first place all capital letter names after that small case letter names. So, we can use CASE_INSENSITIVE_ORDER, which return a case insensitive order.
+
+names.sort(String.CASE_INSENSITIVE_ORDER);
+OUTPUT : sorting with case Insenesitive : [gaurav, Mohit, nasim, Sumit, Vivek]
+
+Sort A List of Integer :
+
+List<Integer> numbers = Arrays.asList(10, 8, 5, 2, 13, 2);
+numbers.sort(Comparator.naturalOrder());
+Sorting With Lambda Expression :
+
+List<Employee> employees = Arrays.asList(
+        new Employee("Sumit", 18, 2000),
+        new Employee("Karan", 23, 6000),
+        new Employee("Arjun", 25, 4000)
+);
+
+employees.sort((Employee e1, Employee e2) ->
+        e1.getName().compareTo(e2.getName()));
+OUTPUT …
+
+
+Sorting lists in Java 8 can be accomplished using several methods. Here’s an overview of different ways to sort lists in Java 8:
+
+### Example 1: Sorting a List of Strings Alphabetically
+
+#### Using `Comparator.naturalOrder()`
+```java
+import java.util.*;
+
+public class SortExample {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("Vivek", "nasim", "Sumit", "gaurav", "Mohit");
+        names.sort(Comparator.naturalOrder());
+        System.out.println("Sorting with natural order: " + names);
+    }
+}
+```
+**Output:**
+```
+Sorting with natural order: [Mohit, Sumit, Vivek, gaurav, nasim]
+```
+
+#### Using `String.CASE_INSENSITIVE_ORDER`
+```java
+import java.util.*;
+
+public class SortExample {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("Vivek", "nasim", "Sumit", "gaurav", "Mohit");
+        names.sort(String.CASE_INSENSITIVE_ORDER);
+        System.out.println("Sorting with case insensitive order: " + names);
+    }
+}
+```
+**Output:**
+```
+Sorting with case insensitive order: [gaurav, Mohit, nasim, Sumit, Vivek]
+```
+
+### Example 2: Sorting a List of Integers
+
+#### Using `Comparator.naturalOrder()`
+```java
+import java.util.*;
+
+public class SortExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(10, 8, 5, 2, 13, 2);
+        numbers.sort(Comparator.naturalOrder());
+        System.out.println("Sorting integers: " + numbers);
+    }
+}
+```
+**Output:**
+```
+Sorting integers: [2, 2, 5, 8, 10, 13]
+```
+
+### Example 3: Sorting a List of Custom Objects Using Lambda Expressions
+
+#### Sorting by Name
+```java
+import java.util.*;
+
+class Employee {
+    private String name;
+    private int age;
+    private double salary;
+
+    public Employee(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + age + ", " + salary + ")";
+    }
+}
+
+public class SortExample {
+    public static void main(String[] args) {
+        List<Employee> employees = Arrays.asList(
+                new Employee("Sumit", 18, 2000),
+                new Employee("Karan", 23, 6000),
+                new Employee("Arjun", 25, 4000)
+        );
+
+        employees.sort((e1, e2) -> e1.getName().compareTo(e2.getName()));
+        System.out.println("Sorting by name: " + employees);
+    }
+}
+```
+**Output:**
+```
+Sorting by name: [Arjun (25, 4000.0), Karan (23, 6000.0), Sumit (18, 2000.0)]
+```
+
+#### Sorting by Age
+```java
+import java.util.*;
+
+public class SortExample {
+    public static void main(String[] args) {
+        List<Employee> employees = Arrays.asList(
+                new Employee("Sumit", 18, 2000),
+                new Employee("Karan", 23, 6000),
+                new Employee("Arjun", 25, 4000)
+        );
+
+        employees.sort(Comparator.comparingInt(Employee::getAge));
+        System.out.println("Sorting by age: " + employees);
+    }
+}
+```
+**Output:**
+```
+Sorting by age: [Sumit (18, 2000.0), Karan (23, 6000.0), Arjun (25, 4000.0)]
+```
+
+#### Sorting by Salary in Descending Order
+```java
+import java.util.*;
+
+public class SortExample {
+    public static void main(String[] args) {
+        List<Employee> employees = Arrays.asList(
+                new Employee("Sumit", 18, 2000),
+                new Employee("Karan", 23, 6000),
+                new Employee("Arjun", 25, 4000)
+        );
+
+        employees.sort((e1, e2) -> Double.compare(e2.getSalary(), e1.getSalary()));
+        System.out.println("Sorting by salary (descending): " + employees);
+    }
+}
+```
+**Output:**
+```
+Sorting by salary (descending): [Karan (23, 6000.0), Arjun (25, 4000.0), Sumit (18, 2000.0)]
+```
+
+### Summary
+
+- **Alphabetical Sorting of Strings**: Use `Comparator.naturalOrder()` or `String.CASE_INSENSITIVE_ORDER`.
+- **Sorting Integers**: Use `Comparator.naturalOrder()`.
+- **Sorting Custom Objects**: Use lambda expressions or method references with `Comparator`.
+
+By leveraging these Java 8 features, you can efficiently sort various types of collections in a clean and readable manner.
+
+Certainly! Here’s a structured guide to some common Java interview questions and answers for both freshers and experienced professionals. These answers are designed to be comprehensive and can be tailored further based on individual experiences.
+
+---
+
+## Java Interview Questions and Answers (Part-1)
+
+### Q1. What are your roles and responsibilities in your projects?
+
+**Answer:**
+1. **Requirement Gathering:** Collecting requirements from the functional team to understand the needs and objectives of the project.
+2. **Documentation:** Creating and maintaining an Excel sheet or other documentation to log queries related to requirements and tasks.
+3. **Meetings:** Attending meetings with the functional team to clarify any queries logged in the query log.
+4. **Technical Design Document (TDD):** Preparing the Technical Design Document and obtaining approval from the architect and the functional team.
+5. **Code Development:** Writing and developing code based on the approved design.
+6. **Unit Testing:** Performing unit testing to ensure the code functions as expected.
+7. **Code Review:** Participating in code reviews to ensure code quality and adherence to standards.
+8. **Version Control:** Pushing code to the Git repository for version control and collaboration.
+9. **Support:** Providing support for System Integration Testing (SIT) and User Acceptance Testing (UAT) environments to ensure the application meets business requirements.
+
+### Q2. Explain your project architecture.
+
+**Answer:**
+In my recent project, the architecture is designed for a **Banking System** where users can manage their accounts and perform various financial transactions. Here’s a high-level overview:
+
+1. **User Management:** Handles user registration, authentication, and authorization.
+2. **Account Management:** Allows users to open new accounts, modify existing account details, and manage account types (e.g., saving, current).
+3. **Transaction Management:** Manages deposit, withdrawal, and transfer operations. Ensures transaction consistency and security.
+4. **Loan Management:** Provides functionality for users to apply for loans and check loan eligibility based on their criteria.
+5. **Balance Enquiry:** Allows users to check their account balance and transaction history.
+6. **Integration Layer:** Interfaces with external systems such as payment gateways and financial services.
+7. **Database Layer:** Utilizes relational databases (e.g., MySQL, Oracle) to store user information, transaction details, and account data.
+8. **Frontend:** Developed using web technologies (e.g., HTML, CSS, JavaScript, Angular) to provide a user-friendly interface.
+9. **Backend:** Built using Java Spring Boot for business logic and REST APIs to interact with the frontend and database.
+
+### Q3. How many modules are there in your project and what are those?
+
+**Answer:**
+The project consists of several key modules:
+
+1. **Credential Management:** Handles user authentication, authorization, and security aspects.
+2. **Saving Account:** Manages savings accounts including transactions, interest calculations, and account statements.
+3. **Current Account:** Deals with current accounts, overdrafts, and associated transaction management.
+4. **Deposit Loan:** Manages deposit accounts and loan facilities, including application processing and loan approval.
+5. **Balance Enquiry:** Provides functionality for users to view their current account balances and transaction history.
+6. **Reporting Module:** Generates reports on account activities, transaction summaries, and financial statements.
+
+### Additional Tips for Interview Preparation:
+
+1. **Understand Your Project:** Be ready to explain not just the architecture but also how each component fits together and the technologies used.
+2. **Be Specific:** Tailor your answers to reflect your actual experience and responsibilities.
+3. **Prepare Examples:** Use concrete examples from your work to illustrate your role and how you contributed to the project's success.
+4. **Stay Updated:** Keep abreast of new developments in Java and related technologies to discuss during interviews.
+
+---
+
+Feel free to adapt and expand upon these answers based on your personal experiences and the specific context of your projects.
+
+
+Certainly! Here’s a continuation of the Java interview questions and answers with a focus on more advanced or specific topics, especially relevant for those with some experience.
+
+---
+
+## Java Interview Questions and Answers (Part-2)
+
+### Q26. Do you know mocking? Could you please explain a scenario where you have used mocking?
+
+**Answer:**
+
+**Mocking** is a process of creating mock objects to simulate the behavior of real objects in a controlled way. This is particularly useful in unit testing to isolate the component being tested from its dependencies.
+
+**Scenario Example:**
+
+In our application, we had several controller classes that needed to be tested. To write effective unit tests for these controllers, we used mocking to avoid the need for a real database or external service calls. For instance, when testing a controller that interacts with a service layer, we mocked the service layer to return predefined responses. This allowed us to test the controller logic without relying on the actual implementation of the service.
+
+**Implementation Steps:**
+1. **Mocking Service Layer:** We used libraries like Mockito to create mock objects of our service classes.
+2. **Defining Behavior:** We defined the behavior of these mocks, such as returning specific values when methods are called.
+3. **Injecting Mocks:** We injected these mock objects into the controller to test its behavior.
+4. **Verifying Interactions:** We verified that the controller interacts with the mock objects as expected.
+
+Mocking was also employed to simulate third-party API calls, ensuring our unit tests did not depend on external systems and could be run in isolation.
+
+### Q27. How do you debug an issue in a production environment?
+
+**Answer:**
+
+**Debugging** in a production environment requires careful handling to avoid impacting the live system. Here’s how I approach it:
+
+1. **Log Analysis:** 
+   - **Check Log Files:** Examine application logs for error messages, stack traces, and any unusual patterns. Logs often provide critical information about where the issue occurred.
+   - **Use Log Levels:** Ensure different log levels (INFO, DEBUG, ERROR) are properly set up to capture relevant information without overwhelming the log files.
+
+2. **Monitor Performance Metrics:**
+   - **Use Monitoring Tools:** Utilize tools like Prometheus, Grafana, or application performance monitoring (APM) solutions to track metrics and identify performance bottlenecks or unusual activity.
+
+3. **Reproduce the Issue:**
+   - **Simulate the Environment:** Try to reproduce the issue in a staging environment that mirrors the production setup as closely as possible.
+   - **Check Recent Changes:** Investigate recent deployments or configuration changes that might have introduced the issue.
+
+4. **Diagnostic Tools:**
+   - **Use Debugging Tools:** Employ tools like Java VisualVM or JConsole to monitor JVM metrics and thread activity.
+
+5. **Hotfixes:**
+   - **Deploy Hotfixes:** If a critical issue is identified, deploy a hotfix carefully to address the problem while ensuring minimal impact on users.
+
+### Q28. What is Logging?
+
+**Answer:**
+
+**Logging** is the practice of recording events and activities that occur within an application. It provides a way to track the application's behavior, diagnose issues, and monitor system health. Logs can be used for various purposes, including debugging, auditing, and performance monitoring.
+
+**Types of Logging:**
+1. **Information Logging:** Captures general information about application events, such as startup and shutdown sequences.
+2. **Error Logging:** Records error messages and exceptions to help diagnose issues.
+3. **Debug Logging:** Provides detailed information about the application's internal state, useful during development and troubleshooting.
+4. **Audit Logging:** Tracks critical operations for security and compliance purposes.
+
+**Implementation:**
+- **Logging Frameworks:** Use frameworks like Log4j, SLF4J, or Java Util Logging to configure and manage logging in your application.
+- **Log Levels:** Configure different log levels (e.g., TRACE, DEBUG, INFO, WARN, ERROR) based on the importance and verbosity of the logs.
+- **Log Rotation:** Implement log rotation policies to manage log file sizes and archive old logs to prevent disk space issues.
+
+**Example in Code:**
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MyClass {
+    private static final Logger logger = LoggerFactory.getLogger(MyClass.class);
+
+    public void doSomething() {
+        logger.info("Starting the process");
+        try {
+            // Business logic here
+        } catch (Exception e) {
+            logger.error("An error occurred", e);
+        }
+        logger.info("Process completed");
+    }
+}
+```
+
+### Additional Tips:
+
+1. **Be Specific:** Tailor your answers with examples from your own experience to make them more impactful.
+2. **Stay Current:** Be aware of recent trends and updates in Java technologies to demonstrate your ongoing learning and adaptation.
+3. **Practice:** Regularly practice common interview questions and scenarios to improve your confidence and clarity in responses.
+
+Feel free to expand on these answers with more details based on your experiences and the specific context of the interview.
+
+---
+
+Count Occurrence of each character in String using Java 8
+
+In this tutorial we will learn How to count occurrences of a character from string using java8 stream API.
+
+First we will split string based on “” empty string value and will store into Array of string and after that we will use Arrays.Stream(-) method and convert into stream and after converting into stream we can call .collect(-) method.Inside collect(-) method we can pass the parameter Collectors.groupingBy(-,-) and Inside Collectors.groupingBy(-,-) function we can pass the two parameters one is Function.identity() to find the unique identity of each element and second parameter we can pass Collectors.counting() to count the number of occurrence for each character.
+
+String input = "gainjavaknowledge";
+
+String [] array = input.split("");
+ 
+Map<String, Long> output = Arrays.stream(array).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class CountCharacterOccurrence {
+
+    public static void main(String[] args) {
+        String input = "gainjavaknowledge";
+
+        Map<String, Long> output = Arrays.stream(input.split("")).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        System.out.println("Output : "+output);
+
+    }
+}
+
+How to find duplicate elements from string using Java8?
+Gain Java Knowledge
+Gain Java Knowledge
+
+·
+Follow
+
+1 min read
+·
+Aug 6, 2023
+7
+
+
+
+
+In this tutorial, we will learn How to filter out duplicate characters in Java 8.
+
+First we will split string based on “” empty string value and will store into Array of string and after that we will use Arrays.Stream(-) method and convert into stream and after converting into stream we can call .collect(-) method.Inside collect(-) method we can pass the parameter Collectors.groupingBy(-,-) and Inside Collectors.groupingBy(-,-) function we can pass the two parameters one is Function.identity() to find the unique identity of each element and second parameter we can paas Collectors.counting() to count the number of occurrence for each character. After that we again need to convert Map into stream to apply stream functions. So we can call .entrySet().stream() and now we can apply the filter and restrict the data based on condition .filter(ele -> ele.getValue() > 1) . Now we will store all the duplicate keys into ArrayList and print the duplicateElements.
+
+Below is the complete Code :
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class FindDuplicateCharFromString {
+
+    public static void main(String[] args) {
+
+        String input = "gainjavaknowledge";
+
+        List<String> duplicateElements = Arrays.stream(input.split(""))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()…
+}
+}
+
+
+Java Program To Find First Non-Repeated Character In String
+Gain Java Knowledge
+Gain Java Knowledge
+
+·
+Follow
+
+1 min read
+·
+Aug 13, 2023
+64
+
+
+
+
+In this tutorial, we will learn How to find first non repeated characters in Java 8.
+
+First we will split string based on “” empty string value and will store into Array of string and after that we will use Arrays.Stream(-) method and convert into stream and after converting into stream we can call .collect(-) method.Inside collect(-) method we can pass the parameter Collectors.groupingBy(-,-) and Inside Collectors.groupingBy(-,-) function we can pass the two parameters one is Function.identity() to find the unique identity of each element and second parameter we can paas Collectors.counting() to count the number of occurrence for each character. After that we again need to convert Map into stream to apply stream functions. So we can call .entrySet().stream() and now we can apply the filter and restrict the data based on condition .filter(ele -> ele.getValue() == 1) . Now we will store all the non repeated keys into ArrayList and will pick the first non repeated character and Print the output.
+
+Below is the complete Code :
+
+package com.demo.main;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class FindFirstNonRepeatedCharacter {
+
+    public static void main(String[] args) {
+
+        String input = "gainjavaknowledge";
+
+        String output = Arrays.stream(input.split(""))
+                .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new…
+}}

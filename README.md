@@ -2828,7 +2828,7 @@ You’re right; using HTML `<br>` tags inside code blocks often leads to issues 
 
 Here’s how you can format your table with code blocks properly:
 
-```markdown
+```
 | Java 7 | Java 8 |
 |--------|--------|
 | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` |
@@ -2836,7 +2836,7 @@ Here’s how you can format your table with code blocks properly:
 
 In standard Markdown, you should avoid using HTML tags for line breaks within code blocks. Instead, the backticks approach should work well:
 
-```markdown
+```
 | Java 7 | Java 8 |
 |--------|--------|
 | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` |

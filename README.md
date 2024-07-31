@@ -2822,43 +2822,5 @@ public class FindFirstNonRepeatedCharacter {
 
 | Java 7 | Java 8 |
 |--------|--------|
-| <pre lang="java"> public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} </pre> |<pre lang="java">public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre>|
+| <pre> public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} </pre> |<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre>|
 
-| Java 7 | Java 8 |
-|--------|--------|
-| <pre lang="java">public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> |<pre lang="java">public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre>|
-
-| Java 7 | Java 8 |
-|--------|--------|
-| <pre lang="java"><p>public class HelloWorld {<p></p>    public static void main(String[] args) {<p></p>        System.out.println("Hello, World!");<p></p>    }<p></p>}</pre> |<pre lang="java"><p>public class HelloWorld {<p></p>   public static void main(String[] args) {<p></p>       System.out.println("Hello, World!");<p></p>    }<p></p>}</pre>|
-
-<!-- language-all: json -->
-
-| Status | Response  |
-| ------ | --------- |
-| 200    |Some code here:<br><pre><code>{<br>  "id": 10,<br>  "username": "alanpartridge"<br>}</code></pre>|
-| 400    |Some text here|
-
-```json
-{
-"responce" : "Hello world!", 
-"status": 200,
-"iamlong": true
-}
-```
-
-| # | Description | Expected result |
-| ---- | ------------- | ------------------------------------------------------|
-| 1 | Call some API | Answer ```json
- {
- "responce" : "Hello world!", 
- "status": 200,
- "iamlong": true
- }
- ```|
- 
- 
-| # | Description | Expected result |
-| ---- | ----------------------- | -----------------------------------------------------------------------------------------|
-| 1 | Call <br> some <br> API | Answer ```json {"responce" : "Hello world!", <br> "status": 200, "iamlong": true } ``` | 
-| 2 | Call some API | Answer `{"responce" : "Hello world!", ` <br> ` "status": 200, ` <br> ` "iamlong": true }`|

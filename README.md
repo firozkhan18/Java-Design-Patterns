@@ -2818,3 +2818,20 @@ public class FindFirstNonRepeatedCharacter {
         String output = Arrays.stream(input.split(""))
                 .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new…
 }}
+
+
+| Java 7 | Java 8 |
+|----------|----------|
+| ```java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+```     | ```java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+``` |

@@ -2830,3 +2830,27 @@ public class FindFirstNonRepeatedCharacter {
 | ------ | --------- |
 | 200    |Some code here:<br><pre><code>{<br>  "id": 10,<br>  "username": "alanpartridge"<br>}</code></pre>|
 | 400    |Some text here|
+
+```json
+{
+"responce" : "Hello world!", 
+"status": 200,
+"iamlong": true
+}
+```
+
+| # | Description | Expected result |
+| ---- | ------------- | ------------------------------------------------------|
+| 1 | Call some API | Answer ```json
+ {
+ "responce" : "Hello world!", 
+ "status": 200,
+ "iamlong": true
+ }
+ ```|
+ 
+ 
+| # | Description | Expected result |
+| ---- | ----------------------- | -----------------------------------------------------------------------------------------|
+| 1 | Call <br> some <br> API | Answer ```json {"responce" : "Hello world!", <br> "status": 200, "iamlong": true } ``` | 
+| 2 | Call some API | Answer `{"responce" : "Hello world!", ` <br> ` "status": 200, ` <br> ` "iamlong": true }`|

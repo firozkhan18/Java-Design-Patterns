@@ -2824,3 +2824,22 @@ public class FindFirstNonRepeatedCharacter {
 |--------|--------|
 | ```java <p>public class HelloWorld {</p><p>    public static void main(String[] args) {</p><p>        System.out.println("Hello, World!");</p><p>    }</p><p>} ``` | ```java <p>public class HelloWorld {</p><p>   public static void main(String[] args) {</p><p>       System.out.println("Hello, World!");</p><p>    }</p><p>} ``` |
 
+You’re right; using HTML `<br>` tags inside code blocks often leads to issues in Markdown tables. Instead, it’s best to use triple backticks to denote multi-line code blocks without relying on HTML tags.
+
+Here’s how you can format your table with code blocks properly:
+
+```markdown
+| Java 7 | Java 8 |
+|--------|--------|
+| ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` |
+```
+
+In standard Markdown, you should avoid using HTML tags for line breaks within code blocks. Instead, the backticks approach should work well:
+
+```markdown
+| Java 7 | Java 8 |
+|--------|--------|
+| ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` |
+```
+
+If you are using a Markdown renderer that does not handle multi-line code blocks well within tables, consider simplifying the presentation or using another method to include code snippets.

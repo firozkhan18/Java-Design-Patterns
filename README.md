@@ -2841,5 +2841,7 @@ In standard Markdown, you should avoid using HTML tags for line breaks within co
 |--------|--------|
 | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` | ```java<br>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} ``` |
 
-
+| Name | Signature Code                 |
+|------|--------------------------------|
+| Minhas Kamal | <pre>main(m,k){<br>  for(<br>    ;<br>    m%k--?:(k=m++);<br>    k^1?:printf("%i\|",m)<br>  );<br>}</pre> |
 If you are using a Markdown renderer that does not handle multi-line code blocks well within tables, consider simplifying the presentation or using another method to include code snippets.

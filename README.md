@@ -2819,8 +2819,8 @@ public class FindFirstNonRepeatedCharacter {
                 .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new…
 }}
 
-```java
+
 | Java 7 | Java 8 |
 |--------|--------|
-| <pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> |<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> |
-```
+|```java <pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> |<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre> ```|
+

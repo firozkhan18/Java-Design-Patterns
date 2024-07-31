@@ -2823,3 +2823,10 @@ public class FindFirstNonRepeatedCharacter {
 | Java 7 | Java 8 |
 |--------|--------|
 | <pre> public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>} </pre> |<pre>public class HelloWorld {<br>    public static void main(String[] args) {<br>        System.out.println("Hello, World!");<br>    }<br>}</pre>|
+
+<!-- language-all: json -->
+
+| Status | Response  |
+| ------ | --------- |
+| 200    |Some code here:<br><pre><code>{<br>  "id": 10,<br>  "username": "alanpartridge"<br>}</code></pre>|
+| 400    |Some text here|

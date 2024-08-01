@@ -529,3 +529,195 @@ public class OrderProcessingService {
 Each microservice focuses on a specific business capability, such as managing products or processing orders.
 
 These examples demonstrate basic implementations of each design pattern using Java. For production systems, additional considerations such as security, configuration management, and comprehensive error handling would be necessary.
+
+The Saga pattern is a design pattern used to manage long-running transactions in microservices architectures. It helps ensure data consistency across multiple services without relying on distributed transactions, which can be complex and costly.
+
+### **Concept of Saga Pattern**
+
+A Saga is a sequence of local transactions where each transaction updates a database and publishes an event or message. If a transaction fails, compensating actions are triggered to rollback the changes made by previous transactions. This ensures that the system remains in a consistent state even if some of the operations fail.
+
+### **Saga Pattern Components**
+
+1. **Transactions:** Each microservice performs a local transaction and sends a message to the next service in the saga.
+2. **Compensating Actions:** If a transaction fails, compensating actions are executed to undo the changes made by the previous transactions.
+3. **Orchestrator:** Coordinates the saga, managing the sequence of transactions and compensations.
+
+### **Saga Implementation Strategies**
+
+1. **Choreography:** Each service knows about the next service and directly communicates with it. No central coordinator is needed.
+2. **Orchestration:** A central orchestrator manages the saga, invoking each service in sequence and handling failures.
+
+### **Example of Saga Pattern in Java**
+
+Let's implement a simple example of the Saga pattern using **orchestration**. We'll create a saga to handle an order processing workflow involving payment and inventory services.
+
+#### **1. Set Up the Services**
+
+We'll have three services:
+
+- **Order Service:** Initiates the saga and sends a message to the Payment Service.
+- **Payment Service:** Processes the payment and sends a message to the Inventory Service.
+- **Inventory Service:** Updates inventory and performs compensating actions if needed.
+
+#### **2. Order Service**
+
+**OrderServiceApplication.java**
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.*;
+
+@SpringBootApplication
+public class OrderServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderServiceApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+    private final PaymentClient paymentClient;
+
+    public OrderController(PaymentClient paymentClient) {
+        this.paymentClient = paymentClient;
+    }
+
+    @PostMapping("/{orderId}")
+    public String createOrder(@PathVariable String orderId) {
+        // Start the saga
+        String paymentResponse = paymentClient.processPayment(orderId);
+        if ("SUCCESS".equals(paymentResponse)) {
+            return "Order Created Successfully";
+        } else {
+            return "Order Creation Failed";
+        }
+    }
+}
+```
+
+**PaymentClient.java**
+```java
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+public class PaymentClient {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public String processPayment(String orderId) {
+        String paymentServiceUrl = "http://payment-service/payments/" + orderId;
+        return restTemplate.postForObject(paymentServiceUrl, null, String.class);
+    }
+}
+```
+
+#### **3. Payment Service**
+
+**PaymentServiceApplication.java**
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.*;
+
+@SpringBootApplication
+public class PaymentServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(PaymentServiceApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/payments")
+public class PaymentController {
+
+    private final InventoryClient inventoryClient;
+
+    public PaymentController(InventoryClient inventoryClient) {
+        this.inventoryClient = inventoryClient;
+    }
+
+    @PostMapping("/{orderId}")
+    public String processPayment(@PathVariable String orderId) {
+        // Simulate payment processing
+        boolean paymentSuccess = true; // or false for failure
+        
+        if (paymentSuccess) {
+            return inventoryClient.updateInventory(orderId);
+        } else {
+            // Compensating action: notify the order service
+            return "FAILURE";
+        }
+    }
+}
+```
+
+**InventoryClient.java**
+```java
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+public class InventoryClient {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public String updateInventory(String orderId) {
+        String inventoryServiceUrl = "http://inventory-service/inventory/" + orderId;
+        return restTemplate.postForObject(inventoryServiceUrl, null, String.class);
+    }
+}
+```
+
+#### **4. Inventory Service**
+
+**InventoryServiceApplication.java**
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.*;
+
+@SpringBootApplication
+public class InventoryServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(InventoryServiceApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/inventory")
+public class InventoryController {
+
+    @PostMapping("/{orderId}")
+    public String updateInventory(@PathVariable String orderId) {
+        // Simulate inventory update
+        boolean inventorySuccess = true; // or false for failure
+        
+        if (inventorySuccess) {
+            return "SUCCESS";
+        } else {
+            // Compensating action: rollback payment
+            rollbackPayment(orderId);
+            return "FAILURE";
+        }
+    }
+
+    private void rollbackPayment(String orderId) {
+        // Logic to rollback payment (e.g., send a compensation request to the payment service)
+    }
+}
+```
+
+### **Handling Compensation**
+
+In the `InventoryService`, if the inventory update fails, we call the `rollbackPayment` method. This method would typically send a request to the `PaymentService` to reverse the payment.
+
+### **Summary**
+
+The Saga pattern ensures that even if one service fails, compensating actions are taken to maintain consistency. The orchestrator (in our case, the `OrderService`) coordinates the sequence of transactions and compensations. 
+
+In this example, the saga is orchestrated by the `OrderService`, which initiates the process and handles failures by coordinating with the other services. Each service is responsible for its part of the transaction and handles compensations if any step fails.
+
+This pattern helps manage distributed transactions effectively by breaking them into smaller, manageable parts and handling failures gracefully.

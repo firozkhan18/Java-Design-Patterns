@@ -1,3 +1,4 @@
+```
 graph TD
     A[Client] --> B[API Gateway]
     B --> C[Service A]
@@ -38,7 +39,7 @@ graph TD
     class B apiGateway;
     class C,D,E microservice;
     class G,H,I database;
-
+```
 
 Certainly! The SOLID principles are a set of five design principles that help developers create software that is easy to manage and scale. Here’s an in-depth explanation of each SOLID principle with Java code examples.
 

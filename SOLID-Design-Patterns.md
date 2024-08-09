@@ -1,3 +1,45 @@
+graph TD
+    A[Client] --> B[API Gateway]
+    B --> C[Service A]
+    B --> D[Service B]
+    B --> E[Service C]
+
+    B --> |Routing| F[API Gateway Details]
+    B --> |Load Balancing| F
+    B --> |Authentication| F
+    B --> |Aggregation| F
+
+    C --> G[Database A]
+    D --> H[Database B]
+    E --> I[Database C]
+
+    subgraph API_Gateway_Details
+        F
+    end
+
+    subgraph Microservices
+        C
+        D
+        E
+    end
+
+    subgraph Databases
+        G
+        H
+        I
+    end
+
+    classDef client fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef apiGateway fill:#ccf,stroke:#333,stroke-width:2px;
+    classDef microservice fill:#cfc,stroke:#333,stroke-width:2px;
+    classDef database fill:#fcf,stroke:#333,stroke-width:2px;
+
+    class A client;
+    class B apiGateway;
+    class C,D,E microservice;
+    class G,H,I database;
+
+
 Certainly! The SOLID principles are a set of five design principles that help developers create software that is easy to manage and scale. Here’s an in-depth explanation of each SOLID principle with Java code examples.
 
 ### 1. Single Responsibility Principle (SRP)

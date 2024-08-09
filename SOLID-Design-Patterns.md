@@ -207,6 +207,80 @@ In this diagram:
 
 The SAGA pattern is essential in distributed systems to manage complex, long-running transactions and ensure data consistency across multiple services.
 
+Certainly! The SAGA pattern can be implemented using two primary approaches: **Choreography** and **Orchestration**. Here are diagrams for both approaches using Mermaid syntax.
+
+### **1. SAGA Choreography**
+
+In **Choreography**, each service involved in the SAGA knows about the next service and is responsible for calling it. There is no central coordinator; each service informs the next service in the process.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant ServiceA
+    participant ServiceB
+    participant ServiceC
+
+    Client->>ServiceA: Start SAGA
+    ServiceA->>ServiceB: Execute Operation B
+    ServiceB->>ServiceC: Execute Operation C
+
+    alt Failure in Service B
+        ServiceB->>ServiceA: Compensate Operation A
+        ServiceA->>Client: Notify Failure
+    end
+
+    ServiceC->>Client: Notify Success
+```
+
+**Explanation**:
+- **Client** starts the SAGA by calling **ServiceA**.
+- **ServiceA** then calls **ServiceB**, and **ServiceB** calls **ServiceC**.
+- If a failure occurs in **ServiceB**, it triggers compensations in **ServiceA**.
+- **ServiceC** sends a success notification back to the **Client** if all operations succeed.
+
+### **2. SAGA Orchestration**
+
+In **Orchestration**, a central coordinator (the orchestrator) manages the SAGA process, invoking each service in the correct order and handling compensations if necessary.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Orchestrator
+    participant ServiceA
+    participant ServiceB
+    participant ServiceC
+
+    Client->>Orchestrator: Start SAGA
+    Orchestrator->>ServiceA: Execute Operation A
+    ServiceA-->>Orchestrator: A Completed
+    Orchestrator->>ServiceB: Execute Operation B
+    ServiceB-->>Orchestrator: B Completed
+    Orchestrator->>ServiceC: Execute Operation C
+    ServiceC-->>Orchestrator: C Completed
+
+    alt Failure in ServiceB
+        Orchestrator->>ServiceA: Compensate Operation A
+        ServiceA-->>Orchestrator: A Compensation Completed
+        Orchestrator->>ServiceB: Compensate Operation B
+        ServiceB-->>Orchestrator: B Compensation Completed
+    end
+
+    Orchestrator-->>Client: SAGA Completed/Failed
+```
+
+**Explanation**:
+- **Client** starts the SAGA through the **Orchestrator**.
+- The **Orchestrator** invokes **ServiceA**, **ServiceB**, and **ServiceC** in sequence.
+- If a failure occurs in **ServiceB**, the **Orchestrator** handles compensations by calling **ServiceA** and **ServiceB** to undo changes.
+- The **Orchestrator** then sends a success or failure notification back to the **Client**.
+
+### Summary
+
+- **Choreography**: Each service in the SAGA knows the next service and manages its own transactions and compensations. It promotes loose coupling but requires services to be aware of each other.
+- **Orchestration**: A central orchestrator manages the entire process, invoking services and handling compensations. It provides a single point of control but can be a single point of failure or bottleneck.
+
+Both approaches have their use cases and can be chosen based on the specific requirements of the system and the desired level of control and complexity.
+
 Certainly! The SOLID principles are a set of five design principles that help developers create software that is easy to manage and scale. Here’s an in-depth explanation of each SOLID principle with Java code examples.
 
 ### 1. Single Responsibility Principle (SRP)

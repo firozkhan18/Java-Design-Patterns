@@ -281,6 +281,105 @@ sequenceDiagram
 
 Both approaches have their use cases and can be chosen based on the specific requirements of the system and the desired level of control and complexity.
 
+Certainly! Below are the flow diagrams for the SAGA pattern using **Choreography** and **Orchestration** approaches, represented in Mermaid syntax.
+
+### **1. SAGA Choreography Flow Diagram**
+
+In the **Choreography** approach, each service communicates directly with the next service and manages its own state and compensations.
+
+```mermaid
+graph TD
+    Client --> ServiceA
+    ServiceA --> ServiceB
+    ServiceB --> ServiceC
+
+    subgraph ServiceA
+        A_Start[Start Operation A] --> A_Success[Operation A Completed]
+        A_Fail[Operation A Failed] --> A_Compensate[Compensate Operation A]
+    end
+
+    subgraph ServiceB
+        B_Start[Start Operation B] --> B_Success[Operation B Completed]
+        B_Fail[Operation B Failed] --> B_Compensate[Compensate Operation B]
+    end
+
+    subgraph ServiceC
+        C_Start[Start Operation C] --> C_Success[Operation C Completed]
+        C_Fail[Operation C Failed] --> C_Compensate[Compensate Operation C]
+    end
+
+    ServiceA -->|Success| ServiceB
+    ServiceB -->|Success| ServiceC
+    ServiceB -->|Fail| ServiceA
+    ServiceC -->|Success| Client
+    ServiceC -->|Fail| ServiceB
+```
+
+**Explanation**:
+- The **Client** starts the SAGA by calling **ServiceA**.
+- **ServiceA** performs its operation and, upon success, calls **ServiceB**.
+- **ServiceB** performs its operation and, upon success, calls **ServiceC**.
+- If any service fails, it triggers compensations in the previous services in the sequence.
+- If **ServiceC** succeeds, it notifies the **Client** of the successful completion.
+
+### **2. SAGA Orchestration Flow Diagram**
+
+In the **Orchestration** approach, a central **Orchestrator** manages the sequence of service calls and compensations.
+
+```mermaid
+graph TD
+    Client --> Orchestrator
+    Orchestrator --> ServiceA
+    Orchestrator --> ServiceB
+    Orchestrator --> ServiceC
+
+    subgraph Orchestrator
+        O_Start[Start SAGA] --> O_OperationA[Execute Operation A]
+        O_OperationA --> O_OperationB[Execute Operation B]
+        O_OperationB --> O_OperationC[Execute Operation C]
+        O_OperationC --> O_Complete[SAGA Completed]
+        O_Fail[Operation Failed] --> O_CompensateA[Compensate Operation A]
+        O_CompensateA --> O_CompensateB[Compensate Operation B]
+        O_CompensateB --> O_Complete
+    end
+
+    subgraph ServiceA
+        A_Start[Start Operation A] --> A_Success[Operation A Completed]
+        A_Fail[Operation A Failed]
+    end
+
+    subgraph ServiceB
+        B_Start[Start Operation B] --> B_Success[Operation B Completed]
+        B_Fail[Operation B Failed]
+    end
+
+    subgraph ServiceC
+        C_Start[Start Operation C] --> C_Success[Operation C Completed]
+        C_Fail[Operation C Failed]
+    end
+
+    Orchestrator -->|Invoke| ServiceA
+    Orchestrator -->|Invoke| ServiceB
+    Orchestrator -->|Invoke| ServiceC
+
+    ServiceA -->|Success| Orchestrator
+    ServiceB -->|Success| Orchestrator
+    ServiceC -->|Success| Orchestrator
+
+    ServiceA -->|Fail| Orchestrator
+    ServiceB -->|Fail| Orchestrator
+    ServiceC -->|Fail| Orchestrator
+```
+
+**Explanation**:
+- The **Client** starts the SAGA via the **Orchestrator**.
+- The **Orchestrator** manages the sequence of service calls to **ServiceA**, **ServiceB**, and **ServiceC**.
+- If any service fails, the **Orchestrator** triggers compensations in the previous services.
+- **ServiceA**, **ServiceB**, and **ServiceC** report their status back to the **Orchestrator**.
+- The **Orchestrator** completes the SAGA and informs the **Client** of the result.
+
+These diagrams illustrate how each approach manages the flow of operations and compensations in a SAGA pattern. **Choreography** involves direct service-to-service communication, while **Orchestration** centralizes control and coordination through a single orchestrator.
+
 Certainly! The SOLID principles are a set of five design principles that help developers create software that is easy to manage and scale. Here’s an in-depth explanation of each SOLID principle with Java code examples.
 
 ### 1. Single Responsibility Principle (SRP)
